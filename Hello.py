@@ -14,37 +14,47 @@
 
 import streamlit as st
 from streamlit.logger import get_logger
+import matplotlib.pyplot as plt
+import numpy as np
+import csv
 
 LOGGER = get_logger(__name__)
 
+
+def getGraph():
+    try:
+        X = []
+        Y = []
+        Y2 = []
+        with open('growth.csv', 'r') as datafile:
+            plotting = csv.reader(datafile, delimiter=';')
+
+            for ROWS in plotting:
+                X.append(float(ROWS[0]))
+                Y.append(float(ROWS[1].replace(',','.')))
+                Y2.append(float(ROWS[2].replace(',','.')))
+        plt.bar(X,Y,align='edge',color='#0088cc')
+        plt.bar(X,Y2,align='edge',color='#686e7a') 
+        plt.xticks(np.arange(1,19,1))
+        plt.title('График прироста цен по месяцам')
+        plt.xlabel('Месяц')
+        plt.ylabel('Цена')
+        return plt
+    except Exception:
+        return {"message":"error in generating plot"}
+    
+def getInfo():
+    getGraph().savefig('growth.png')
+    templates={"message":"generated succesfully"}
+    return templates
 
 def run():
     st.set_page_config(
         page_title="Hello",
         page_icon="👋",
     )
-
-    st.write("# Welcome to Streamlit! 👋")
-
-    st.sidebar.success("Select a demo above.")
-
-    st.markdown(
-        """
-        Streamlit is an open-source app framework built specifically for
-        Machine Learning and Data Science projects.
-        **👈 Select a demo from the sidebar** to see some examples
-        of what Streamlit can do!
-        ### Want to learn more?
-        - Check out [streamlit.io](https://streamlit.io)
-        - Jump into our [documentation](https://docs.streamlit.io)
-        - Ask a question in our [community
-          forums](https://discuss.streamlit.io)
-        ### See more complex demos
-        - Use a neural net to [analyze the Udacity Self-driving Car Image
-          Dataset](https://github.com/streamlit/demo-self-driving)
-        - Explore a [New York City rideshare dataset](https://github.com/streamlit/demo-uber-nyc-pickups)
-    """
-    )
+    getInfo()
+    st.image("growth.png")
 
 
 if __name__ == "__main__":
